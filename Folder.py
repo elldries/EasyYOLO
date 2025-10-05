@@ -147,14 +147,14 @@ def interactive_mode():
     """Interactive mode for creating dataset folders"""
     print("""
 ╔════════════════════════════════════════════════════════════════════╗
-║            Dataset Folder Creator - Lieris AI Training             ║
+║                   Dataset Folder Creator - Lieris                  ║
 ╚════════════════════════════════════════════════════════════════════╝
     """)
     
     print("This tool creates the necessary folder structure for YOLO AI training.")
     print("All folders will be created in the DATA/ directory.")
     print("\nYou will need:")
-    print("  • 500-2000 game screenshots showing targets (enemies, heads, etc.)")
+    print("  • 500-2000 game/any screenshots showing targets (enemies, heads, etc.)")
     print("  • Labeling tool (LabelImg, Roboflow, or CVAT)")
     print("  • Label files in YOLO format (.txt files)\n")
     
