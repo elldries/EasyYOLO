@@ -3,6 +3,4 @@ open-source Python toolkit for simplifying YOLO AI development. Build object det
 
 git clone https://github.com/elldries/EasyYOLO.git
 
-# DwAll - Install everything necessary
-# Folder - Create necessary folders=
-# Train - Train and create AI
+DwAll - Install everything necessary ; Folder - Create necessary folders ; Train - Train and create AI
