@@ -227,7 +227,7 @@ def validate_dataset(data_folder):
         print("   Layout 2: images/train, labels/train, images/val, labels/val")
         return False
     
-    print(f"\n📊 Files Found:")
+    print(f"\n Files Found:")
     print(f"   Training images: {len(train_images)}")
     print(f"   Training labels: {len(train_labels)}")
     print(f"   Validation images: {len(val_images)}")
@@ -531,11 +531,11 @@ def create_new_model(config, registry):
     print(f"{'─'*70}")
     for i, model in enumerate(TrainingConfig.VALID_BASE_MODELS, 1):
         size_desc = {
-            'n': '⚡ Fastest, Least Accurate',
-            's': '🚀 Fast, Good Accuracy',
-            'm': '⚖️  Balanced Speed/Accuracy',
-            'l': '🎯 Slow, High Accuracy',
-            'x': '🔥 Slowest, Best Accuracy'
+            'n': ' Fastest, Least Accurate',
+            's': ' Fast, Good Accuracy',
+            'm': '  Balanced Speed/Accuracy',
+            'l': ' Slow, High Accuracy',
+            'x': ' Slowest, Best Accuracy'
         }
         model_size = model.split('.')[0][-1]
         desc = size_desc.get(model_size, '')
@@ -730,7 +730,7 @@ def interactive_mode():
         clear_screen()
         print("""
 ╔══════════════════════════════════════════════════════════════════╗
-║                     Lieris AI - YOLO Training                    ║
+║                     Lieris - YOLO Training                       ║
 ╚══════════════════════════════════════════════════════════════════╝
 """)
         
