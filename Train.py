@@ -61,6 +61,7 @@ class TrainingConfig:
         self.data_folder = "DATA"
         self.model_registry_path = None
         self.model_output_dir = None
+        self.class_names = None
 
 
 class ModelRegistry:
@@ -227,7 +228,7 @@ def validate_dataset(data_folder):
         print("   Layout 2: images/train, labels/train, images/val, labels/val")
         return False
     
-    print(f"\n Files Found:")
+    print(f"\n📊 Files Found:")
     print(f"   Training images: {len(train_images)}")
     print(f"   Training labels: {len(train_labels)}")
     print(f"   Validation images: {len(val_images)}")
@@ -312,7 +313,7 @@ def auto_split_dataset(data_folder):
             print(f"✓ Moved {len(val_images)} images to validation set")
 
 
-def create_dataset_yaml(data_folder, num_classes=None):
+def create_dataset_yaml(data_folder, num_classes=None, custom_class_names=None):
     """Create dataset.yaml file"""
     data_path = Path(data_folder)
     yaml_path = data_path / "dataset.yaml"
@@ -347,18 +348,20 @@ def create_dataset_yaml(data_folder, num_classes=None):
         min_class = 0
         max_class = num_classes - 1
     
-    class_names = {
-        1: 'head',
-        2: 'body'
-    }
-    
     names_list = []
-    if min_class == 1 and max_class == 2:
-        names_list = ['head', 'body']
-    elif min_class == 0:
-        names_list = [class_names.get(i, f'class_{i}') for i in range(num_classes)]
+    if custom_class_names:
+        names_list = [custom_class_names.get(i, f'class_{i}') for i in range(num_classes)]
     else:
-        names_list = [class_names.get(i+min_class, f'class_{i+min_class}') for i in range(num_classes)]
+        default_class_names = {
+            0: 'head',
+            1: 'body'
+        }
+        if min_class == 0 and max_class == 1:
+            names_list = ['head', 'body']
+        elif min_class == 0:
+            names_list = [default_class_names.get(i, f'class_{i}') for i in range(num_classes)]
+        else:
+            names_list = [default_class_names.get(i+min_class, f'class_{i+min_class}') for i in range(num_classes)]
     
     if layout1_valid:
         dataset_config = {
@@ -407,7 +410,7 @@ def train_model(config):
             print(f"⚠  {result['error']}\n")
             return result
         
-        data_yaml = create_dataset_yaml(config.data_folder)
+        data_yaml = create_dataset_yaml(config.data_folder, custom_class_names=config.class_names)
         
         if config.resume:
             print(f"\n► Resuming training from: {config.resume}")
@@ -570,6 +573,54 @@ def create_new_model(config, registry):
     else:
         config.device = 'cpu'
     
+    print(f"\n{'─'*70}")
+    print("Class Names Configuration (data.yaml)")
+    print(f"{'─'*70}")
+    
+    data_path = Path(config.data_folder)
+    layout1_valid = (data_path / "train" / "labels").exists()
+    layout2_valid = (data_path / "labels" / "train").exists()
+    
+    unique_classes = set()
+    if layout1_valid:
+        label_files = list((data_path / "train" / "labels").glob("*.txt"))
+    elif layout2_valid:
+        label_files = list((data_path / "labels" / "train").glob("*.txt"))
+    else:
+        label_files = []
+    
+    for label_file in label_files[:100]:
+        try:
+            with open(label_file, 'r') as f:
+                for line in f:
+                    parts = line.strip().split()
+                    if parts:
+                        class_id = int(parts[0])
+                        unique_classes.add(class_id)
+        except:
+            pass
+    
+    if unique_classes:
+        num_classes = len(unique_classes)
+        print(f"\nDetected {num_classes} class(es) in labels: {sorted(unique_classes)}")
+        print("\nEnter names for each class:")
+        
+        config.class_names = {}
+        for class_id in sorted(unique_classes):
+            while True:
+                name = input(f"  Class {class_id} = ").strip()
+                if name:
+                    config.class_names[class_id] = name
+                    break
+                print("    ✗ Name cannot be empty, try again")
+        
+        print(f"\n✓ Class names configured:")
+        for class_id in sorted(config.class_names.keys()):
+            print(f"    {class_id} = {config.class_names[class_id]}")
+    else:
+        print("\n⚠  Could not detect classes in dataset, using defaults")
+        config.class_names = None
+    
     config.model_output_dir = Path(config.data_folder) / "models" / f"{config.name}_{config.version}"
     
     print(f"\n{'─'*70}")
@@ -580,6 +631,9 @@ def create_new_model(config, registry):
     print(f"  Base Model:    {config.base_model}")
     print(f"  Epochs:        {config.epochs}")
     print(f"  Device:        {config.device}")
+    print(f"  Dataset:       {config.data_folder}")
+    if config.class_names:
+        print(f"  Classes:       {', '.join([f'{k}={v}' for k, v in sorted(config.class_names.items())])}")
     print(f"  Output Dir:    {config.model_output_dir}")
     print(f"{'─'*70}")
     
@@ -642,6 +696,20 @@ def continue_training_model(config, registry):
         input("\n► Press Enter to continue...")
         return False
     
+    print(f"\n{'─'*70}")
+    print("Select Dataset for Continue Training")
+    print(f"{'─'*70}")
+    print(f"\nCurrent dataset: {config.data_folder}")
+    use_current = input("► Use this dataset? ([Y]es/[N]o - select another) [default: Y]: ").strip().lower()
+    
+    if use_current in ['n', 'no']:
+        config.data_folder = select_dataset()
+        
+        data_path = Path(config.data_folder)
+        models_dir = data_path / "models"
+        models_dir.mkdir(parents=True, exist_ok=True)
+        config.model_registry_path = models_dir / "model_registry.json"
+    
     while True:
         epochs_input = input("\n► Additional epochs [default: 50]: ").strip()
         try:
@@ -666,8 +734,10 @@ def continue_training_model(config, registry):
     print(f"{'─'*70}")
     print(f"  Model:         {config.name} {config.version}")
     print(f"  Resume from:   {config.resume}")
+    print(f"  Dataset:       {config.data_folder}")
     print(f"  Add. Epochs:   {config.epochs}")
     print(f"  Device:        {config.device}")
+    print(f"  Output:        {config.model_output_dir}")
     print(f"{'─'*70}")
     
     confirm = input("\n► Continue training? ([Y]es/[N]o) [default: Y]: ").strip().lower()
@@ -730,7 +800,7 @@ def interactive_mode():
         clear_screen()
         print("""
 ╔══════════════════════════════════════════════════════════════════╗
-║                     Lieris - YOLO Training                       ║
+║                       Lieris - YOLO Training                     ║
 ╚══════════════════════════════════════════════════════════════════╝
 """)
         
