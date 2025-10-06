@@ -39,14 +39,14 @@ def check_cuda():
 def main():
     print("""
 ╔══════════════════════════════════════════════════════════╗
-║           Lieris AI - Dependency Installer              ║
-║                                                          ║
-║  This script will install all required dependencies:    ║
-║  - PyTorch (with CUDA if available)                     ║
-║  - Ultralytics YOLOv8/v11                               ║
-║  - OpenCV                                                ║
-║  - ONNX Runtime                                          ║
-║  - Additional utilities                                  ║
+║           Lieris   - Dependency Installer                          ║
+║   by: elldries                                                     ║
+║  This script will install all required dependencies:               ║
+║  - PyTorch (with CUDA if available)                                ║
+║  - Ultralytics YOLOv8/v11                                          ║
+║  - OpenCV                                                          ║
+║  - ONNX Runtime                                                    ║
+║  - Additional utilities                                            ║
 ╚══════════════════════════════════════════════════════════╝
     """)
     
