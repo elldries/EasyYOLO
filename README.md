@@ -5,4 +5,4 @@ git clone https://github.com/elldries/EasyYOLO.git
 
 DwAll - Install everything necessary ; Folder - Create necessary folders ; Train - Train and create AI
 
-By: ChatGpt, elldries, Claude, Bursino, Ruvex
+By: ChatGpt, Elldries, Claude, Bursino, Ruvex
