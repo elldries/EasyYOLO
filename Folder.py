@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 ОПИСАНИЕ ФУНКЦИЙ ПИСАЛА ИИ, НЕ ЕБИТЕ МОЗГИ, ЭТО ДЛЯ ВАШЕГО ЖЕ БЛАГА! THE AI WROTE THE FUNCTION DESCRIPTIONS, DON'T FUCK WITH MY HEAD, IT'S FOR YOUR OWN GOOD!
 """
 Folder.py - Dataset Folder Creator
 Creates the necessary folder structure for YOLO training datasets
