@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 ОПИСАНИЕ ФУНКЦИЙ ПИСАЛА ИИ, НЕ ЕБИТЕ МОЗГИ, ЭТО ДЛЯ ВАШЕГО ЖЕ БЛАГА! THE AI WROTE THE FUNCTION DESCRIPTIONS, DON'T FUCK WITH MY HEAD, IT'S FOR YOUR OWN GOOD!
+
 """
-Lieris AI - Dependency Installation Script
-Installs all necessary dependencies for the Lieris AI application
+Lieris Installer
 """
 
 import subprocess
@@ -39,14 +39,14 @@ def check_cuda():
 def main():
     print("""
 ╔══════════════════════════════════════════════════════════╗
-║           Lieris   - Dependency Installer                          ║
-║   by: elldries                                                     ║
-║  This script will install all required dependencies:               ║
-║  - PyTorch (with CUDA if available)                                ║
-║  - Ultralytics YOLOv8/v11                                          ║
-║  - OpenCV                                                          ║
-║  - ONNX Runtime                                                    ║
-║  - Additional utilities                                            ║
+║           Lieris   - Dependency Installer                ║
+║   by: elldries                                           ║
+║  This script will install all required dependencies:     ║
+║  - PyTorch (with CUDA if available)                      ║
+║  - Ultralytics YOLOv8/v11                                ║
+║  - OpenCV                                                ║
+║  - ONNX Runtime                                          ║
+║  - Additional utilities                                  ║
 ╚══════════════════════════════════════════════════════════╝
     """)
     
