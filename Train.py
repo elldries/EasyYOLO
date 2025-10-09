@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 
 """
 Train.py - YOLO Model Training Script
 Supports YOLOv8 and YOLO11 models with versioning and interactive mode
@@ -228,7 +228,7 @@ def validate_dataset(data_folder):
         print("   Layout 2: images/train, labels/train, images/val, labels/val")
         return False
     
-    print(f"\n📊 Files Found:")
+    print(f"\n Files Found:")
     print(f"   Training images: {len(train_images)}")
     print(f"   Training labels: {len(train_labels)}")
     print(f"   Validation images: {len(val_images)}")
