@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 ОПИСАНИЕ ФУНКЦИЙ ПИСАЛА ИИ, НЕ ЕБИТЕ МОЗГИ, ЭТО ДЛЯ ВАШЕГО ЖЕ БЛАГА! THE AI WROTE THE FUNCTION DESCRIPTIONS, DON'T FUCK WITH MY HEAD, IT'S FOR YOUR OWN GOOD!
+#!/usr/bin/env python3
 """
 Train.py - YOLO Model Training Script
 Supports YOLOv8 and YOLO11 models with versioning and interactive mode
@@ -426,6 +426,7 @@ def train_model(config):
         results = model.train(
             data=str(data_yaml),
             epochs=config.epochs,
+            imgsz=1280, 
             device=config.device,
             project=str(config.model_output_dir.parent),
             name=config.model_output_dir.name,
