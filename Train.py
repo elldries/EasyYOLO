@@ -460,12 +460,13 @@ def train_model(config):
         results = model.train(
             data=str(data_yaml),
             epochs=config.epochs,
-            imgsz=1280, 
+            imgsz=640, 
             device=config.device,
             project=str(config.model_output_dir.parent),
             name=config.model_output_dir.name,
             exist_ok=True,
-            verbose=True
+            verbose=True,
+            patience=0
         )
         
         best_model_path = config.model_output_dir / "weights" / "best.pt"
