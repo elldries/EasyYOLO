@@ -27,21 +27,43 @@ except ImportError:
 
 def check_and_install_cuda():
     """Check CUDA availability and provide installation guidance"""
-    if not torch.cuda.is_available():
-        print("\n⚠  CUDA is not available. Training will use CPU (slower).")
-        print("\nTo enable CUDA support:")
-        print("  1. Install NVIDIA GPU drivers: https://www.nvidia.com/Download/index.aspx")
-        print("  2. Install CUDA Toolkit: https://developer.nvidia.com/cuda-downloads")
-        print("  3. Reinstall PyTorch with CUDA support:")
-        print("     pip uninstall torch torchvision")
-        print("     pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118")
+    print("\n" + "="*70)
+    print("CUDA Detection")
+    print("="*70)
+    
+    print(f"PyTorch Version: {torch.__version__}")
+    
+    if torch.cuda.is_available():
+        print(f"CUDA Available: YES")
+        print(f"CUDA Version (PyTorch): {torch.version.cuda}")
+        print(f"GPU Count: {torch.cuda.device_count()}")
+        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
+        print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+        print("="*70)
+        return True
+    else:
+        print(f"CUDA Available: NO")
+        print(f"PyTorch CUDA Build: {torch.version.cuda if torch.version.cuda else 'CPU-only version'}")
+        print("="*70)
+        print("\nWARNING: CUDA is not available. Training will use CPU (VERY SLOW).")
+        print("\nPossible reasons:")
+        print("  1. PyTorch CPU-only version is installed")
+        print("  2. NVIDIA GPU drivers not installed")
+        print("  3. CUDA Toolkit not compatible with PyTorch")
+        print("\nTo fix:")
+        print("  1. Check if you have NVIDIA GPU: nvidia-smi")
+        print("  2. Reinstall PyTorch with CUDA support:")
+        print("     For Python 3.13:")
+        print("       pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118")
+        print("     For Python 3.8-3.12:")
+        print("       pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121")
+        print("="*70)
         
-        response = input("\n► Continue with CPU training? ([Y]es/[N]o) [default: Y]: ").strip().lower()
+        response = input("\nContinue with CPU training? ([Y]es/[N]o) [default: Y]: ").strip().lower()
         if response in ['n', 'no']:
-            print("\n✓ Exiting. Install CUDA support and try again.\n")
+            print("\nExiting. Install CUDA support and try again.\n")
             sys.exit(0)
         return False
-    return True
 
 
 class TrainingConfig:
@@ -402,8 +424,20 @@ def train_model(config):
     
     try:
         if config.device == 'cuda' and not torch.cuda.is_available():
-            print("⚠  Warning: CUDA requested but not available, falling back to CPU")
+            print("\n" + "="*70)
+            print("WARNING: CUDA requested but not available")
+            print("="*70)
+            print("Falling back to CPU mode")
+            print("Training will be VERY SLOW on CPU")
+            print("\nTo fix: Reinstall PyTorch with CUDA support")
+            print("  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118")
+            print("="*70 + "\n")
             config.device = 'cpu'
+        elif config.device == 'cuda':
+            print("\n" + "="*70)
+            print(f"Using GPU: {torch.cuda.get_device_name(0)}")
+            print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+            print("="*70 + "\n")
         
         if not validate_dataset(config.data_folder):
             result["error"] = "Dataset validation failed"
@@ -569,10 +603,15 @@ def create_new_model(config, registry):
     
     cuda_available = check_and_install_cuda()
     if cuda_available:
-        device_input = input("► Device ([1]=CUDA, [2]=CPU) [default: CUDA]: ").strip()
+        device_input = input("\n► Device ([1]=CUDA/GPU, [2]=CPU) [default: CUDA]: ").strip()
         config.device = 'cpu' if device_input == '2' else 'cuda'
+        if config.device == 'cuda':
+            print(f"Selected: GPU ({torch.cuda.get_device_name(0)})")
+        else:
+            print("Selected: CPU (slow)")
     else:
         config.device = 'cpu'
+        print("Selected: CPU (slow - CUDA not available)")
     
     print(f"\n{'─'*70}")
     print("Class Names Configuration (data.yaml)")
@@ -723,10 +762,15 @@ def continue_training_model(config, registry):
     
     cuda_available = check_and_install_cuda()
     if cuda_available:
-        device_input = input("► Device ([1]=CUDA, [2]=CPU) [default: CUDA]: ").strip()
+        device_input = input("\n► Device ([1]=CUDA/GPU, [2]=CPU) [default: CUDA]: ").strip()
         config.device = 'cpu' if device_input == '2' else 'cuda'
+        if config.device == 'cuda':
+            print(f"Selected: GPU ({torch.cuda.get_device_name(0)})")
+        else:
+            print("Selected: CPU (slow)")
     else:
         config.device = 'cpu'
+        print("Selected: CPU (slow - CUDA not available)")
     
     config.model_output_dir = Path(config.data_folder) / "models" / f"{config.name}_{config.version}"
     
@@ -854,10 +898,22 @@ def main():
         config.epochs = args.epochs
         
         if args.device == 'cuda' and not torch.cuda.is_available():
-            print("⚠  Warning: CUDA requested but not available, using CPU instead")
+            print("\n" + "="*70)
+            print("WARNING: CUDA requested but not available")
+            print("="*70)
+            print("PyTorch Version:", torch.__version__)
+            print("PyTorch CUDA:", torch.version.cuda if torch.version.cuda else "CPU-only")
+            print("\nFalling back to CPU mode")
+            print("Training will be VERY SLOW on CPU")
+            print("\nTo fix: Reinstall PyTorch with CUDA support")
+            print("  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118")
+            print("="*70 + "\n")
             config.device = 'cpu'
         else:
             config.device = args.device
+            if config.device == 'cuda':
+                print(f"\nUsing GPU: {torch.cuda.get_device_name(0)}")
+                print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB\n")
         
         config.data_folder = args.data_folder
         
